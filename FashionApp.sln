@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35825.156 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FashionApp", "FashionApp\FashionApp.csproj", "{1BE2C89A-E8EB-47CE-9CAD-7178E502CF84}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FashionApp.BusinessAndDataLogic", "FashionApp.BusinessAndDataLogic\FashionApp.BusinessAndDataLogic.csproj", "{0478586B-C27F-4A5B-87A1-3A63AAE37B51}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1BE2C89A-E8EB-47CE-9CAD-7178E502CF84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1BE2C89A-E8EB-47CE-9CAD-7178E502CF84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1BE2C89A-E8EB-47CE-9CAD-7178E502CF84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1BE2C89A-E8EB-47CE-9CAD-7178E502CF84}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0478586B-C27F-4A5B-87A1-3A63AAE37B51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0478586B-C27F-4A5B-87A1-3A63AAE37B51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0478586B-C27F-4A5B-87A1-3A63AAE37B51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0478586B-C27F-4A5B-87A1-3A63AAE37B51}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {29B4716B-1D2F-49DB-80FA-7EB7D3BFA8B9}
+	EndGlobalSection
+EndGlobal
