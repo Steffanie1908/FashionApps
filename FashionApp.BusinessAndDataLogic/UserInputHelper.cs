@@ -1,27 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace FashionApp.BusinessAndDataLogic;
-public static class UserInputHelper
+namespace FashionApp.BusinessAndDataLogic
 {
-    public static int GetUserChoice(int minValue, int maxValue)
+    public static class UserInputHelper
     {
-        int choice;
-        bool isValid = false;
+        // Validates if a value is within the specified range
 
-        do
+        public static bool IsValidChoice(int value, int minValue, int maxValue)
         {
-            Console.Write($"Enter choice ({minValue}-{maxValue}): ");
-            isValid = int.TryParse(Console.ReadLine(), out choice) && choice >= minValue && choice <= maxValue;
+            return value >= minValue && value <= maxValue;
+        }
 
-            if (!isValid)
-                Console.WriteLine($"Invalid input. Please enter a number between {minValue} and {maxValue}.");
-
-        } while (!isValid);
-
-        return choice;
+        // Attempts to parse a string to an integer and validates it's within range
+        public static bool TryParseChoice(string input, int minValue, int maxValue, out int result)
+        {
+            if (int.TryParse(input, out result))
+            {
+                return IsValidChoice(result, minValue, maxValue);
+            }
+            return false;
+        }
     }
 }
