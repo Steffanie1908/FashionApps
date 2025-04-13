@@ -1,11 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 
-namespace FashionApp.BusinessAndDataLogic
+namespace FashionApp_Business_Logic
 {
     public static class UserInputHelper
     {
         // Validates if a value is within the specified range
-
         public static bool IsValidChoice(int value, int minValue, int maxValue)
         {
             return value >= minValue && value <= maxValue;
@@ -18,7 +18,14 @@ namespace FashionApp.BusinessAndDataLogic
             {
                 return IsValidChoice(result, minValue, maxValue);
             }
+            result = 0;
             return false;
+        }
+
+        // Validate string input is not empty
+        public static bool IsValidString(string input)
+        {
+            return !string.IsNullOrWhiteSpace(input);
         }
     }
 }
