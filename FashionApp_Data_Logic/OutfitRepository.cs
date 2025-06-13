@@ -17,13 +17,13 @@ namespace FashionApp_Data_Logic
             outfits = new List<OutfitModel>();
             nextId = 1;
 
-            // Sample outfits added 
+          
             AddSampleOutfits();
         }
 
         private void AddSampleOutfits()
         {
-            // Add initial outfit styles with recommendations
+            
             outfits.Add(new OutfitModel
             {
                 Id = nextId++,
@@ -57,7 +57,7 @@ namespace FashionApp_Data_Logic
             });
         }
 
-        // CREATE: Add a new outfit
+        
         public bool AddOutfit(string name, string recommendation)
         {
             // Check for empty name
@@ -84,13 +84,13 @@ namespace FashionApp_Data_Logic
             return true;
         }
 
-        // RETRIEVE: Get all outfits
+        
         public List<OutfitModel> GetAllOutfits()
         {
             return new List<OutfitModel>(outfits);
         }
 
-        // RETRIEVE: Get available outfit names as array
+        
         public string[] GetAvailableOutfitNames()
         {
             List<string> names = new List<string>();
@@ -106,7 +106,7 @@ namespace FashionApp_Data_Logic
             return names.ToArray();
         }
 
-        // RETRIEVE: Finds outfit by ID
+        
         public OutfitModel GetOutfitById(int id)
         {
             foreach (OutfitModel outfit in outfits)
@@ -119,7 +119,7 @@ namespace FashionApp_Data_Logic
 
             return null;
         }
-        // SEARCH: Find outfits by search term
+        
         public List<OutfitModel> SearchOutfits(string searchTerm)
         {
             // If search term is empty, return all outfits
@@ -144,7 +144,7 @@ namespace FashionApp_Data_Logic
             return results;
         }
 
-        // UPDATE: Modifies an existing outfit
+      
         public bool UpdateOutfit(int id, string name, string recommendation, bool isAvailable)
         {
             // Checks for empty name
@@ -174,7 +174,7 @@ namespace FashionApp_Data_Logic
             return true;
         }
 
-        // DELETE: Removes an outfit
+        
         public bool DeleteOutfit(int id)
         {
             // Finds the outfit to delete

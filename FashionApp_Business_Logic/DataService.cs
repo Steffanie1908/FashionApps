@@ -1,20 +1,39 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using FashionApp_Data_Logic;
 
 namespace FashionApp_Business_Logic
 {
     public class DataService
     {
-        private readonly OutfitService outfitService;
+        private readonly OutfitService _outfitService;
 
         public DataService()
         {
-            outfitService = new OutfitService();
+            // Default InMemory repository
+            IOutfitRepository repository = new InMemoryOutfitRepository();
+            _outfitService = new OutfitService(repository);
         }
 
+        public DataService(string dataSourceType, string connectionStringOrPath = null)
+        {
+            IOutfitRepository repository = dataSourceType.ToLower() switch
+            {
+                "inmemory" => new InMemoryOutfitRepository(),
+                "textfile" => new TextFileOutfitRepository(connectionStringOrPath ?? "outfits.txt"),
+                "jsonfile" => new JsonFileOutfitRepository(connectionStringOrPath ?? "outfits.json"),
+                "sqlserver" => new SqlServerOutfitRepository(connectionStringOrPath ?? GetDefaultConnectionString()),
+                _ => throw new ArgumentException("Invalid data source type")
+            };
+
+            _outfitService = new OutfitService(repository);
+        }
+
+        private string GetDefaultConnectionString()
+        {
+            return "Server=.;Database=FashionAppDB;Integrated Security=True;";
+        }
         public string[] GetAvailableOutfits()
         {
-            return outfitService.GetAvailableOutfits();
+            return _outfitService.GetAvailableOutfits();
         }
 
         public string[] GetAvailableActions()
@@ -30,9 +49,10 @@ namespace FashionApp_Business_Logic
                 "[7] Exit"
             };
         }
+
         public OutfitService GetOutfitService()
         {
-            return outfitService;
+            return _outfitService;
         }
     }
 }

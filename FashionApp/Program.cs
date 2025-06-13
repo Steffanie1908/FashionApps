@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using FashionApp_Business_Logic;
+﻿using FashionApp_Business_Logic;
 using FashionApp_Data_Logic;
+using System.Configuration;
+using System.Data.SqlClient;
 
 namespace FashionApp.ConsoleApp
 {
@@ -9,28 +9,78 @@ namespace FashionApp.ConsoleApp
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("WELCOME TO STYLE SELECTOR");
+            
+            var connectionString = ConfigurationManager.ConnectionStrings["FashionAppDB"]?.ConnectionString;
 
-            var dataService = new DataService();
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                Console.WriteLine("Error: Database connection string not found in config file");
+                Console.WriteLine("Press any key to exit...");
+                Console.ReadKey();
+                return;
+            }
+
+           
+            Console.WriteLine("Testing database connection...");
+            try
+            {
+                using (var connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    Console.WriteLine("✓ Successfully connected to database");
+
+                   
+                    var testRepo = new SqlServerOutfitRepository(connectionString);
+                    var testOutfits = testRepo.GetAllOutfits();
+                    Console.WriteLine($"✓ Found {testOutfits.Count} existing outfits");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"DATABASE ERROR: {ex.Message}");
+                Console.WriteLine("Please check your SQL Server configuration and try again.");
+                Console.WriteLine("Press any key to exit...");
+                Console.ReadKey();
+                return;
+            }
+
+            
+            Console.Clear(); 
+
+           
+            var dataService = new DataService("sqlserver", connectionString);
             var outfitService = dataService.GetOutfitService();
 
+            Console.WriteLine("WELCOME TO STYLE SELECTOR");
+
+           
             bool exitApp = false;
             while (!exitApp)
             {
-                // Gets data from services
-                string[] outfits = dataService.GetAvailableOutfits();
-                string[] actions = dataService.GetAvailableActions();
-
-                // Displays the menu and get user choice
-                DisplayActions(actions);
-                int userAction = GetUserChoice(1, actions.Length);
-
-                // Process the actions
-                exitApp = ProcessUserAction(userAction, outfits, outfitService);
-
-                if (!exitApp)
+                try
                 {
-                    Console.WriteLine("\nPress any key to continue...");
+                    // Gets data from services
+                    string[] outfits = dataService.GetAvailableOutfits();
+                    string[] actions = dataService.GetAvailableActions();
+
+                    // Displays the menu and get user choice
+                    DisplayActions(actions);
+                    int userAction = GetUserChoice(1, actions.Length);
+
+                    // Process the actions
+                    exitApp = ProcessUserAction(userAction, outfits, outfitService);
+
+                    if (!exitApp)
+                    {
+                        Console.WriteLine("\nPress any key to continue...");
+                        Console.ReadKey();
+                        Console.Clear();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"\nAn error occurred: {ex.Message}");
+                    Console.WriteLine("Press any key to continue...");
                     Console.ReadKey();
                     Console.Clear();
                 }
@@ -89,7 +139,7 @@ namespace FashionApp.ConsoleApp
                     DeleteStyle(outfitService);
                     return false;
                 case 7:
-                    return true; // Exit
+                    return true; 
                 default:
                     Console.WriteLine("Invalid choice selected.");
                     return false;
@@ -126,7 +176,7 @@ namespace FashionApp.ConsoleApp
             Console.WriteLine($"Recommendation: {recommendation}");
         }
 
-        // CREATE: Adds a new style
+       
         static void AddNewStyle(OutfitService outfitService)
         {
             Console.WriteLine("\nADD NEW STYLE");
@@ -167,7 +217,7 @@ namespace FashionApp.ConsoleApp
             }
         }
 
-        // SEARCH: Find styles by search
+
         static void SearchStyles(OutfitService outfitService)
         {
             Console.WriteLine("\nSEARCH STYLES");
@@ -190,7 +240,7 @@ namespace FashionApp.ConsoleApp
             }
         }
 
-        // UPDATE: Modifies an existing style
+        
         static void UpdateStyle(OutfitService outfitService)
         {
             Console.WriteLine("\nUPDATE STYLE");
@@ -304,7 +354,7 @@ namespace FashionApp.ConsoleApp
             }
         }
 
-        // DELETE: Remove a style
+        
         static void DeleteStyle(OutfitService outfitService)
         {
             Console.WriteLine("\nDELETE STYLE");

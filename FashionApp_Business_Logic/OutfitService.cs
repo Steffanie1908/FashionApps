@@ -6,69 +6,73 @@ namespace FashionApp_Business_Logic
 {
     public class OutfitService
     {
-        private OutfitRepository repository;
+        private readonly IOutfitRepository _repository;
 
-        public OutfitService()
+        public OutfitService(IOutfitRepository repository)
         {
-            repository = new OutfitRepository();
+            _repository = repository;
         }
 
-        // Get recommendation for a style
         public string GetRecommendation(string style)
         {
-            List<OutfitModel> outfits = repository.GetAllOutfits();
+            var outfits = _repository.GetAllOutfits();
+            var outfit = outfits.FirstOrDefault(o =>
+                o.Name.Equals(style, StringComparison.OrdinalIgnoreCase));
 
-            foreach (OutfitModel outfit in outfits)
-            {
-                if (outfit.Name.ToLower() == style.ToLower())
-                {
-                    return outfit.Recommendation;
-                }
-            }
-
-            return "No recommendations available for this style.";
+            return outfit?.Recommendation ?? "No recommendations available for this style.";
         }
 
-        // Get array of available outfit names
         public string[] GetAvailableOutfits()
         {
-            return repository.GetAvailableOutfitNames();
+            return _repository.GetAvailableOutfitNames();
         }
 
-        // CREATE: Adds a new outfit
         public bool AddNewOutfit(string name, string recommendation)
         {
-            return repository.AddOutfit(name, recommendation);
+            var outfit = new OutfitModel
+            {
+                Name = name,
+                Recommendation = recommendation,
+                IsAvailable = true
+            };
+            return _repository.AddOutfit(outfit);
         }
 
-        // RETRIEVE: Get all outfits
         public List<OutfitModel> GetAllOutfits()
         {
-            return repository.GetAllOutfits();
+            return _repository.GetAllOutfits();
         }
 
-        // SEARCH: Find outfits by search term
         public List<OutfitModel> SearchOutfits(string searchTerm)
         {
-            return repository.SearchOutfits(searchTerm);
+            return _repository.SearchOutfits(searchTerm);
         }
 
-        // RETRIEVE: Get outfit details by ID
         public OutfitModel GetOutfitDetails(int id)
         {
-            return repository.GetOutfitById(id);
+            return _repository.GetOutfitById(id);
         }
 
-        // UPDATE: Modify an existing outfit
         public bool UpdateOutfit(int id, string name, string recommendation, bool isAvailable)
         {
-            return repository.UpdateOutfit(id, name, recommendation, isAvailable);
+            var existingOutfit = _repository.GetOutfitById(id);
+            if (existingOutfit == null)
+                return false;
+
+            var updatedOutfit = new OutfitModel
+            {
+                Id = id,
+                Name = name,
+                Recommendation = recommendation,
+                IsAvailable = isAvailable
+            };
+
+            return _repository.UpdateOutfit(updatedOutfit);
         }
 
-        // DELETE: Remove an outfit
         public bool DeleteOutfit(int id)
         {
-            return repository.DeleteOutfit(id);
+            return _repository.DeleteOutfit(id);
         }
     }
 }
