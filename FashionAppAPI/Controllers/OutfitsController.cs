@@ -1,12 +1,12 @@
 ﻿using FashionApp_Business_Logic;
-using FashionApp_Data_Logic; 
+using FashionApp_Data_Logic;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 
 namespace FashionAppAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")] 
+    [Route("api/[controller]")]
     public class OutfitsController : ControllerBase
     {
         private readonly OutfitService _outfitService;
@@ -44,7 +44,7 @@ namespace FashionAppAPI.Controllers
         [HttpGet("AvailableNames")]
         public ActionResult<IEnumerable<string>> GetAvailableNames()
         {
-            var names = _outfitService.GetAvailableOutfits(); 
+            var names = _outfitService.GetAvailableOutfits();
             if (names == null || !names.Any())
             {
                 return NotFound("No available outfit names found.");
@@ -65,7 +65,7 @@ namespace FashionAppAPI.Controllers
 
             if (success)
             {
-       
+
                 return Ok("Outfit added successfully. You might need to retrieve it by ID or get all outfits to see its assigned ID.");
             }
             else
@@ -88,7 +88,7 @@ namespace FashionAppAPI.Controllers
 
             if (success)
             {
-                return NoContent(); 
+                return NoContent();
             }
             else
             {
@@ -108,7 +108,7 @@ namespace FashionAppAPI.Controllers
             bool success = _outfitService.DeleteOutfit(id);
             if (success)
             {
-                return NoContent(); 
+                return NoContent();
             }
             else
             {

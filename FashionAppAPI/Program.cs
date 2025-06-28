@@ -14,7 +14,7 @@ builder.Services.AddSingleton<IOutfitRepository>(sp =>
 
 
 // Register OutfitService
-builder.Services.AddScoped<OutfitService>(); 
+builder.Services.AddScoped<OutfitService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
