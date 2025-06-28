@@ -9,6 +9,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Configuration.ConfigurationManager" Version="9.0.6" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\FashionApp\FashionApp.csproj" />
     <ProjectReference Include="..\FashionApp_Business_Logic\FashionApp_Business_Logic.csproj" />
     <ProjectReference Include="..\FashionApp_Data_Logic\FashionApp_Data_Logic.csproj" />

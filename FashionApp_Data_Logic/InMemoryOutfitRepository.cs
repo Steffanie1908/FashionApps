@@ -70,5 +70,12 @@ namespace FashionApp_Data_Logic
 
         public string[] GetAvailableOutfitNames() =>
             _outfits.Where(o => o.IsAvailable).Select(o => o.Name).ToArray();
+        public string[] GetAllOutfitNames()
+        {
+            return _outfits
+                .OrderBy(o => o.Name)
+                .Select(o => o.Name)
+                .ToArray();
+        }
     }
 }

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿// FashionApp_Data_Logic/IOutfitRepository.cs
+
+using System.Collections.Generic; // Make sure this is present
 
 namespace FashionApp_Data_Logic
 {
@@ -15,6 +13,6 @@ namespace FashionApp_Data_Logic
         bool DeleteOutfit(int id);
         List<OutfitModel> SearchOutfits(string searchTerm);
         string[] GetAvailableOutfitNames();
+        string[] GetAllOutfitNames(); 
     }
 }
-

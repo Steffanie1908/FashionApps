@@ -37,6 +37,14 @@ namespace FashionApp_Business_Logic
             };
             return _repository.AddOutfit(outfit);
         }
+        public bool AddOutfit(OutfitModel newOutfit)
+        {
+            if (newOutfit == null)
+            {
+                return false;
+            }
+            return _repository.AddOutfit(newOutfit);
+        }
 
         public List<OutfitModel> GetAllOutfits()
         {
@@ -69,6 +77,12 @@ namespace FashionApp_Business_Logic
 
             return _repository.UpdateOutfit(updatedOutfit);
         }
+
+        public string[] GetAllOutfitNames() 
+        {
+            return _repository.GetAllOutfitNames();
+        }
+
 
         public bool DeleteOutfit(int id)
         {

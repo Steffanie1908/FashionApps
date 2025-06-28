@@ -1,0 +1,32 @@
+[
+  {
+    "Id": 1,
+    "Name": "Casual Chic",
+    "Recommendation": "Distressed jeans, oversized knit sweater, ankle boots, and a minimalist backpack.",
+    "IsAvailable": true
+  },
+  {
+    "Id": 2,
+    "Name": "Formal Evening",
+    "Recommendation": "Tailored black dress, stiletto heels, statement clutch, and diamond stud earrings.",
+    "IsAvailable": true
+  },
+  {
+    "Id": 3,
+    "Name": "Sporty Lounge",
+    "Recommendation": "High-waisted leggings, cropped hoodie, chunky sneakers, and a baseball cap.",
+    "IsAvailable": true
+  },
+  {
+    "Id": 4,
+    "Name": "Bohemian Rhapsody",
+    "Recommendation": "Flowy maxi dress, wide-brim hat, gladiators sandals, and layered necklaces.",
+    "IsAvailable": false
+  },
+  {
+    "Id": 5,
+    "Name": "Hip-hop Style",
+    "Recommendation": "Oversized black shirt, Baggy mint green pants, Chain necklace, Silver Rings, Vans shoes",
+    "IsAvailable": true
+  }
+]

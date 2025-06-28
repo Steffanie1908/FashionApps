@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FashionApp_Business_Logic",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FashionApp_Data_Logic", "FashionApp_Data_Logic\FashionApp_Data_Logic.csproj", "{45837578-75D3-4DCE-BE3B-96A221441489}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FashionAppAPI", "FashionAppAPI\FashionAppAPI.csproj", "{389D5E44-BB64-4AAF-8730-10B58BAF54FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FashionApp_Desktop", "FashionApp_Desktop\FashionApp_Desktop.csproj", "{75B530FB-37C9-4D5B-AA3D-0A522D71D467}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{45837578-75D3-4DCE-BE3B-96A221441489}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45837578-75D3-4DCE-BE3B-96A221441489}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{45837578-75D3-4DCE-BE3B-96A221441489}.Release|Any CPU.Build.0 = Release|Any CPU
+		{389D5E44-BB64-4AAF-8730-10B58BAF54FB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{389D5E44-BB64-4AAF-8730-10B58BAF54FB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{389D5E44-BB64-4AAF-8730-10B58BAF54FB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{389D5E44-BB64-4AAF-8730-10B58BAF54FB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{75B530FB-37C9-4D5B-AA3D-0A522D71D467}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{75B530FB-37C9-4D5B-AA3D-0A522D71D467}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{75B530FB-37C9-4D5B-AA3D-0A522D71D467}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{75B530FB-37C9-4D5B-AA3D-0A522D71D467}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
