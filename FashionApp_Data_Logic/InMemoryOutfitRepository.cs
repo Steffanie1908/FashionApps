@@ -1,81 +1,112 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace FashionApp_Data_Logic
 {
     public class InMemoryOutfitRepository : IOutfitRepository
     {
-        private readonly List<OutfitModel> _outfits = new();
-        private int _nextId = 1;
+        private readonly List<OutfitModel> _outfits;
+        private int _nextId;
 
         public InMemoryOutfitRepository()
         {
-            // sample data
-            AddOutfit(new OutfitModel { Name = "Casual", Recommendation = "Jeans, T-shirt, and Sneakers", IsAvailable = true });
-            AddOutfit(new OutfitModel { Name = "Business", Recommendation = "Blazer, Button-up Shirt, and Slacks", IsAvailable = true });
-            AddOutfit(new OutfitModel { Name = "Formal", Recommendation = "Suit/Dress and Formal Shoes", IsAvailable = true });
-            AddOutfit(new OutfitModel { Name = "Sporty", Recommendation = "Athletic Shirt, Shorts, and Running Shoes", IsAvailable = true });
+            _outfits = new List<OutfitModel>();
+            _nextId = 1;
+            SeedData();
+        }
+
+        private void SeedData()
+        {
+            AddOutfit(new OutfitModel { Name = "Casual Chic", Recommendation = "Pair with white sneakers and a crossbody bag.", IsAvailable = true });
+            AddOutfit(new OutfitModel { Name = "Formal Evening", Recommendation = "Accessorize with a clutch and high heels.", IsAvailable = true });
+            AddOutfit(new OutfitModel { Name = "Sporty Look", Recommendation = "Combine with athletic shoes and a cap.", IsAvailable = true });
+            AddOutfit(new OutfitModel { Name = "Boho Vibes", Recommendation = "Wear with sandals and layered jewelry.", IsAvailable = true });
+            AddOutfit(new OutfitModel { Name = "Winter Comfort", Recommendation = "Layer with a warm scarf and boots.", IsAvailable = true });
+            AddOutfit(new OutfitModel { Name = "Summer Breeze", Recommendation = "Light fabric and open-toe shoes.", IsAvailable = true });
+        }
+
+        public OutfitModel GetOutfitById(int id)
+        {
+            return _outfits.FirstOrDefault(o => o.Id == id);
+        }
+
+        public OutfitModel GetOutfitByName(string name)
+        {
+            return _outfits.FirstOrDefault(o => o.Name.Equals(name, System.StringComparison.OrdinalIgnoreCase));
+        }
+
+        public List<OutfitModel> GetAllOutfits()
+        {
+            return new List<OutfitModel>(_outfits);
         }
 
         public bool AddOutfit(OutfitModel outfit)
         {
-            if (outfit == null || string.IsNullOrWhiteSpace(outfit.Name))
+            if (_outfits.Any(o => o.Name.Equals(outfit.Name, System.StringComparison.OrdinalIgnoreCase)))
+            {
                 return false;
-
-            if (_outfits.Any(o => o.Name.Equals(outfit.Name, StringComparison.OrdinalIgnoreCase)))
-                return false;
-
+            }
             outfit.Id = _nextId++;
             _outfits.Add(outfit);
             return true;
         }
 
-        public List<OutfitModel> GetAllOutfits() => new List<OutfitModel>(_outfits);
-
-        public OutfitModel GetOutfitById(int id) => _outfits.FirstOrDefault(o => o.Id == id);
-
         public bool UpdateOutfit(OutfitModel outfit)
         {
-            var existing = GetOutfitById(outfit.Id);
-            if (existing == null) return false;
-
-            if (_outfits.Any(o => o.Id != outfit.Id &&
-                o.Name.Equals(outfit.Name, StringComparison.OrdinalIgnoreCase)))
+            var existingOutfit = GetOutfitById(outfit.Id);
+            if (existingOutfit == null)
+            {
                 return false;
+            }
+            if (_outfits.Any(o => o.Id != outfit.Id && o.Name.Equals(outfit.Name, System.StringComparison.OrdinalIgnoreCase)))
+            {
+                return false;
+            }
 
-            existing.Name = outfit.Name;
-            existing.Recommendation = outfit.Recommendation;
-            existing.IsAvailable = outfit.IsAvailable;
+            existingOutfit.Name = outfit.Name;
+            existingOutfit.Recommendation = outfit.Recommendation;
+            existingOutfit.IsAvailable = outfit.IsAvailable;
             return true;
         }
 
         public bool DeleteOutfit(int id)
         {
-            var outfit = GetOutfitById(id);
-            return outfit != null && _outfits.Remove(outfit);
+            var outfitToRemove = GetOutfitById(id);
+            if (outfitToRemove == null)
+            {
+                return false;
+            }
+            _outfits.Remove(outfitToRemove);
+            return true;
+        }
+
+        public string[] GetAvailableOutfitNames()
+        {
+            return _outfits.Where(o => o.IsAvailable).Select(o => o.Name).ToArray();
         }
 
         public List<OutfitModel> SearchOutfits(string searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
-                return GetAllOutfits();
+            {
+                return new List<OutfitModel>(_outfits);
+            }
 
-            searchTerm = searchTerm.ToLower();
-            return _outfits.Where(o =>
-                o.Name.ToLower().Contains(searchTerm) ||
-                o.Recommendation.ToLower().Contains(searchTerm))
+            string lowerSearchTerm = searchTerm.ToLower();
+            return _outfits
+                .Where(o => o.Name.ToLower().Contains(lowerSearchTerm) ||
+                            o.Recommendation.ToLower().Contains(lowerSearchTerm))
                 .ToList();
         }
 
-        public string[] GetAvailableOutfitNames() =>
-            _outfits.Where(o => o.IsAvailable).Select(o => o.Name).ToArray();
+        public OutfitModel GetOutfitDetails(int id)
+        {
+            return GetOutfitById(id); 
+        }
+
         public string[] GetAllOutfitNames()
         {
-            return _outfits
-                .OrderBy(o => o.Name)
-                .Select(o => o.Name)
-                .ToArray();
+            return _outfits.Select(o => o.Name).OrderBy(name => name).ToArray();
         }
     }
 }

@@ -89,7 +89,7 @@ namespace FashionApp_Data_Logic
             return true;
         }
 
-        public bool DeleteOutfit(int id)
+        public bool DeleteOutfit(int id) 
         {
             var outfit = GetOutfitById(id);
             if (outfit == null) return false;
@@ -120,6 +120,16 @@ namespace FashionApp_Data_Logic
                 .OrderBy(o => o.Name)
                 .Select(o => o.Name)
                 .ToArray();
+        }
+
+        public OutfitModel GetOutfitDetails(int id)
+        {
+            return GetOutfitById(id);
+        }
+
+        public OutfitModel GetOutfitByName(string name)
+        {
+            return _outfits.FirstOrDefault(o => o.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
         }
     }
 }

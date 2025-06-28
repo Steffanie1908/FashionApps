@@ -1,248 +1,189 @@
 using System;
 using System.Windows.Forms;
-using System.Configuration;
 using FashionApp_Business_Logic;
-using FashionApp_Data_Logic; 
+using FashionApp_Data_Logic;
 
 namespace FashionApp_Desktop
 {
     public partial class MainForm : Form
     {
-        private DataService _dataService;
         private OutfitService _outfitService;
+        private UcSearchStyle _ucSearchStyle;
+        private UcViewAllStyles _ucViewAllStyles;
+        private UcAddNewStyle _ucAddNewStyle;
+        private UcUpdateStyle _ucUpdateStyle;
+        private UcDeleteStyleList _ucDeleteStyleList;
+        private UcViewStyleDetails _ucViewStyleDetails;
 
         public MainForm()
         {
             InitializeComponent();
-            InitializeFashionAppServices();
-            SetupMenuButtonEvents();
-            DisplayInitialScreen(); 
+            InitializeApplicationServices();
+            ShowViewAllStylesControl();
         }
 
-        private void InitializeFashionAppServices()
+        private void InitializeApplicationServices()
         {
-            var connectionString = ConfigurationManager.ConnectionStrings["FashionAppDB"]?.ConnectionString;
+            IOutfitRepository outfitRepository = new InMemoryOutfitRepository();
+            _outfitService = new OutfitService(outfitRepository);
+        }
 
-            if (string.IsNullOrEmpty(connectionString))
+        private void ShowUserControl(UserControl userControl)
+        {
+            splitContainer1.Panel2.Controls.Clear();
+            userControl.Dock = DockStyle.Fill;
+            splitContainer1.Panel2.Controls.Add(userControl);
+            userControl.BringToFront();
+        }
+
+        private void ShowViewAllStylesControl()
+        {
+            if (_ucViewAllStyles == null)
             {
-                MessageBox.Show("Error: Database connection string 'FashionAppDB' not found in App.config.", "Configuration Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Application.Exit();
+                _ucViewAllStyles = new UcViewAllStyles(_outfitService);
+                _ucViewAllStyles.OutfitSelected += UcViewAllStyles_OutfitSelected;
+            }
+            ShowUserControl(_ucViewAllStyles);
+            _ucViewAllStyles.LoadOutfits();
+        }
+
+        private void ShowSelectOutfitControl()
+        {
+            MessageBox.Show("To view the details of an outfit, please double click an outfit in the View all styles panel.",
+                            "Functionality Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+
+        private void ShowAddNewStyleControl()
+        {
+            if (_ucAddNewStyle == null)
+            {
+                _ucAddNewStyle = new UcAddNewStyle(_outfitService);
+                _ucAddNewStyle.StyleAdded += UcAddNewStyle_StyleAdded;
+            }
+            ShowUserControl(_ucAddNewStyle);
+            _ucAddNewStyle.ClearFields();
+        }
+
+        private void ShowSearchStylesControl()
+        {
+            if (_ucSearchStyle == null)
+            {
+                _ucSearchStyle = new UcSearchStyle(_outfitService);
+            }
+            ShowUserControl(_ucSearchStyle);
+        }
+
+        private void ShowUpdateStyleControl()
+        {
+            if (_ucUpdateStyle == null)
+            {
+                _ucUpdateStyle = new UcUpdateStyle(_outfitService);
+                _ucUpdateStyle.OutfitUpdated += UcUpdateStyle_OutfitUpdated;
+                _ucUpdateStyle.UpdateCancelled += UcUpdateStyle_UpdateCancelled;
+            }
+            ShowUserControl(_ucUpdateStyle);
+            _ucUpdateStyle.LoadOutfitsForSelection();
+        }
+
+        private void ShowDeleteStyleControl()
+        {
+            if (_ucDeleteStyleList == null)
+            {
+                _ucDeleteStyleList = new UcDeleteStyleList(_outfitService);
+                _ucDeleteStyleList.BackToViewAllStyles += UcDeleteStyleList_BackToViewAllStyles;
+                _ucDeleteStyleList.OutfitDeleted += UcDeleteStyleList_OutfitDeleted;
+            }
+            ShowUserControl(_ucDeleteStyleList);
+            _ucDeleteStyleList.LoadOutfits();
+        }
+
+        public void ShowViewStyleDetailsControl(int outfitId)
+        {
+            OutfitModel outfit = _outfitService.GetOutfitById(outfitId);
+
+            if (outfit == null)
+            {
+                MessageBox.Show("Outfit not found for details view.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
 
-            try
+            if (_ucViewStyleDetails == null)
             {
-                _dataService = new DataService("sqlserver", connectionString);
-                _outfitService = _dataService.GetOutfitService();
-
-                try
-                {
-
-                    _outfitService.GetAllOutfits();
-                    Console.WriteLine("Successfully connected to database and loaded outfit service.");
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"DATABASE CONNECTION ERROR: {ex.Message}\nPlease check your SQL Server configuration and App.config.", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    Application.Exit();
-                }
+                _ucViewStyleDetails = new UcViewStyleDetails(_outfitService);
+                _ucViewStyleDetails.BackToViewAllStyles += UcViewStyleDetails_BackToViewAllStyles;
             }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Failed to initialize FashionApp services: {ex.Message}", "Initialization Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Application.Exit();
-            }
-        }
-
-        private void SetupMenuButtonEvents()
-        {
-            btnViewAllStyles.Click += btnViewAllStyles_Click;
-            btnSelectOutfit.Click += btnSelectOutfit_Click;
-            btnAddNewStyle.Click += btnAddNewStyle_Click;
-            btnSearchStyles.Click += btnSearchStyles_Click;
-            btnUpdateStyle.Click += btnUpdateStyle_Click;
-            btnDeleteStyle.Click += btnDeleteStyle_Click;
-            btnExit.Click += btnExit_Click;
-        }
-
-        private void DisplayInitialScreen()
-        {
-            ShowPanel(CreateViewAllStylesPanel());
-        }
-
-        
-        private void ShowPanel(UserControl userControlToShow)
-        {
-            splitContainer1.Panel2.Controls.Clear(); 
-            userControlToShow.Dock = DockStyle.Fill; 
-            splitContainer1.Panel2.Controls.Add(userControlToShow); 
+            ShowUserControl(_ucViewStyleDetails);
+            _ucViewStyleDetails.LoadOutfitDetails(outfit);
         }
 
         private void btnViewAllStyles_Click(object sender, EventArgs e)
         {
-            ShowPanel(CreateViewAllStylesPanel());
+            ShowViewAllStylesControl();
         }
 
         private void btnSelectOutfit_Click(object sender, EventArgs e)
         {
-            ShowPanel(CreateViewAllStylesPanel());
-        }
-
-        private void btnSelect_Click(object sender, EventArgs e)
-        {
-            ShowPanel(CreateViewAllStylesPanel());
+            ShowSelectOutfitControl(); // This will now show the adjusted message
         }
 
         private void btnAddNewStyle_Click(object sender, EventArgs e)
         {
-            ShowPanel(CreateAddNewStylePanel());
+            ShowAddNewStyleControl();
         }
 
         private void btnSearchStyles_Click(object sender, EventArgs e)
         {
-            ShowPanel(CreateSearchStylesPanel());
+            ShowSearchStylesControl();
         }
 
         private void btnUpdateStyle_Click(object sender, EventArgs e)
         {
-            ShowPanel(CreateUpdateStylePanel());
+            ShowUpdateStyleControl();
         }
 
         private void btnDeleteStyle_Click(object sender, EventArgs e)
         {
-            ShowPanel(CreateDeleteStylePanel());
+            ShowDeleteStyleControl();
         }
 
         private void btnExit_Click(object sender, EventArgs e)
         {
-            Application.Exit(); 
+            Application.Exit();
         }
 
-        private UserControl CreateViewAllStylesPanel()
+        private void UcViewAllStyles_OutfitSelected(object sender, UcViewAllStyles.OutfitSelectedEventArgs e)
         {
-            if (_outfitService == null)
-            {
-                MessageBox.Show("OutfitService is not available in MainForm. Cannot create View All Styles panel.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return new UserControl();
-            }
-
-            UcViewAllStyles uc = new UcViewAllStyles(_outfitService);
-            uc.OutfitSelected += UcViewAll_OutfitSelected;
-            return uc;
-        }
-
-        private void UcViewAll_OutfitSelected(object sender, UcViewAllStyles.OutfitSelectedEventArgs e)
-        {
-           
-            if (splitContainer1.Panel2.Controls.Count > 0 && splitContainer1.Panel2.Controls[0] is UcViewAllStyles currentViewAllPanel)
-            {
-                currentViewAllPanel.OutfitSelected -= UcViewAll_OutfitSelected; 
-                currentViewAllPanel.Dispose(); 
-            }
-
-          
-            UcViewStyleDetails ucDetails = new UcViewStyleDetails();
-            ucDetails.LoadOutfitDetails(e.SelectedOutfit); 
-            ucDetails.BackToViewAllStyles += UcViewDetails_BackToViewAllStyles;
-
-            ShowPanel(ucDetails);
-        }
-
-        private void UcViewDetails_BackToViewAllStyles(object sender, EventArgs e)
-        {
-            if (splitContainer1.Panel2.Controls.Count > 0 && splitContainer1.Panel2.Controls[0] is UcViewStyleDetails currentDetailsPanel)
-            {
-                currentDetailsPanel.BackToViewAllStyles -= UcViewDetails_BackToViewAllStyles; 
-                currentDetailsPanel.Dispose(); 
-            }
-
-            UcViewAllStyles ucViewAll = (UcViewAllStyles)CreateViewAllStylesPanel();
-            ShowPanel(ucViewAll);
-            ucViewAll.LoadOutfits(); 
-        }
-        private UserControl CreateSelectOutfitPanel()
-        {
-            UserControl uc = new UserControl();
-            Label lbl = new Label { Text = "Select Outfit (Handled via View All Styles List)", Dock = DockStyle.Fill, TextAlign = System.Drawing.ContentAlignment.MiddleCenter };
-            uc.Controls.Add(lbl);
-            return uc;
-        }
-
-        private UserControl CreateAddNewStylePanel()
-        {
-            if (_outfitService == null)
-            {
-                MessageBox.Show("OutfitService is not available in MainForm. Cannot create Add New Style panel.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return new UserControl();
-            }
-            UcAddNewStyle uc = new UcAddNewStyle(_outfitService);
-            uc.StyleAdded += UcAddNewStyle_StyleAdded;
-            return uc;
+            ShowViewStyleDetailsControl(e.SelectedOutfit.Id);
         }
 
         private void UcAddNewStyle_StyleAdded(object sender, EventArgs e)
         {
-            if (splitContainer1.Panel2.Controls.Count > 0 && splitContainer1.Panel2.Controls[0] is UcAddNewStyle currentAddPanel)
-            {
-                currentAddPanel.StyleAdded -= UcAddNewStyle_StyleAdded;
-                currentAddPanel.Dispose();
-            }
-            ShowPanel(CreateViewAllStylesPanel());
-        }
-
-        private UserControl CreateSearchStylesPanel()
-        {
-            UserControl uc = new UserControl();
-            Label lbl = new Label { Text = "Search Styles (Coming Soon)", Dock = DockStyle.Fill, TextAlign = System.Drawing.ContentAlignment.MiddleCenter };
-            uc.Controls.Add(lbl);
-            return uc;
-        }
-
-        private UserControl CreateUpdateStylePanel()
-        {
-            if (_outfitService == null)
-            {
-                MessageBox.Show("OutfitService is not available in MainForm. Cannot create Update Style panel.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return new UserControl();
-            }
-            UcUpdateStyle ucUpdate = new UcUpdateStyle(_outfitService);
-            ucUpdate.OutfitUpdated += UcUpdateStyle_OutfitUpdated;
-            ucUpdate.UpdateCancelled += UcUpdateStyle_UpdateCancelled;
-            return ucUpdate;
+            ShowViewAllStylesControl();
         }
 
         private void UcUpdateStyle_OutfitUpdated(object sender, EventArgs e)
         {
-            if (splitContainer1.Panel2.Controls.Count > 0 && splitContainer1.Panel2.Controls[0] is UcUpdateStyle currentUpdatePanel)
-            {
-                currentUpdatePanel.OutfitUpdated -= UcUpdateStyle_OutfitUpdated;
-                currentUpdatePanel.UpdateCancelled -= UcUpdateStyle_UpdateCancelled;
-                currentUpdatePanel.Dispose();
-            }
-            ShowPanel(CreateViewAllStylesPanel());
+            ShowViewAllStylesControl();
         }
 
         private void UcUpdateStyle_UpdateCancelled(object sender, EventArgs e)
         {
-            if (splitContainer1.Panel2.Controls.Count > 0 && splitContainer1.Panel2.Controls[0] is UcUpdateStyle currentUpdatePanel)
-            {
-                currentUpdatePanel.OutfitUpdated -= UcUpdateStyle_OutfitUpdated;
-                currentUpdatePanel.UpdateCancelled -= UcUpdateStyle_UpdateCancelled;
-                currentUpdatePanel.Dispose();
-            }
-            ShowPanel(CreateViewAllStylesPanel());
+            ShowViewAllStylesControl();
         }
 
-        private UserControl CreateDeleteStylePanel()
+        private void UcDeleteStyleList_BackToViewAllStyles(object sender, EventArgs e)
         {
-            UserControl uc = new UserControl();
-            Label lbl = new Label { Text = "Delete Style (Coming Soon)", Dock = DockStyle.Fill, TextAlign = System.Drawing.ContentAlignment.MiddleCenter };
-            uc.Controls.Add(lbl);
-            return uc;
+            ShowViewAllStylesControl();
         }
 
-        private void splitContainer1_Panel2_Paint(object sender, PaintEventArgs e)
+        private void UcDeleteStyleList_OutfitDeleted(object sender, EventArgs e)
         {
+            ShowViewAllStylesControl();
+        }
+
+        private void UcViewStyleDetails_BackToViewAllStyles(object sender, EventArgs e)
+        {
+            ShowViewAllStylesControl();
         }
     }
 }

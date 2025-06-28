@@ -122,7 +122,6 @@ namespace FashionApp_Data_Logic
         
         public List<OutfitModel> SearchOutfits(string searchTerm)
         {
-            // If search term is empty, return all outfits
             if (string.IsNullOrWhiteSpace(searchTerm))
             {
                 return GetAllOutfits();
@@ -130,7 +129,6 @@ namespace FashionApp_Data_Logic
 
             searchTerm = searchTerm.ToLower();
 
-            // Search through outfits for matching name or recommendation
             List<OutfitModel> results = new List<OutfitModel>();
             foreach (var outfit in outfits)
             {
@@ -147,26 +145,22 @@ namespace FashionApp_Data_Logic
       
         public bool UpdateOutfit(int id, string name, string recommendation, bool isAvailable)
         {
-            // Checks for empty name
             if (string.IsNullOrWhiteSpace(name))
             {
                 return false;
             }
 
-            // Find the outfit to update
             var outfitToUpdate = GetOutfitById(id);
             if (outfitToUpdate == null)
             {
                 return false;
             }
 
-            // Checks for duplicate name (that isn't this outfit)
             if (outfits.Exists(o => o.Id != id && o.Name.ToLower() == name.ToLower()))
             {
                 return false;
             }
 
-            // Updates the outfit
             outfitToUpdate.Name = name;
             outfitToUpdate.Recommendation = recommendation;
             outfitToUpdate.IsAvailable = isAvailable;
@@ -177,14 +171,12 @@ namespace FashionApp_Data_Logic
         
         public bool DeleteOutfit(int id)
         {
-            // Finds the outfit to delete
             var outfitToDelete = GetOutfitById(id);
             if (outfitToDelete == null)
             {
                 return false;
             }
 
-            // Removes the outfit
             return outfits.Remove(outfitToDelete);
         }
     }

@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Linq; 
+using System.Linq;
 using System.Windows.Forms;
 using FashionApp_Business_Logic;
 using FashionApp_Data_Logic;
@@ -9,17 +9,16 @@ namespace FashionApp_Desktop
     public partial class UcUpdateStyle : UserControl
     {
         private OutfitService _outfitService;
-        private int _currentOutfitId = -1; 
+        private int _currentOutfitId = -1;
 
-        
         public event EventHandler OutfitUpdated;
-        public event EventHandler UpdateCancelled; 
+        public event EventHandler UpdateCancelled;
 
         public UcUpdateStyle(OutfitService outfitService)
         {
             InitializeComponent();
             _outfitService = outfitService;
-            LoadOutfitNamesToComboBox(); 
+            this.Load += new EventHandler(UcUpdateStyle_Load); 
         }
 
         private void LoadOutfitNamesToComboBox()
@@ -32,11 +31,15 @@ namespace FashionApp_Desktop
 
             try
             {
-                var outfitNames = _outfitService.GetAllOutfitNames();
+                var allOutfits = _outfitService.GetAllOutfits();
                 cmbSelectOutfit.Items.Clear();
-                cmbSelectOutfit.Items.AddRange(outfitNames);
-                cmbSelectOutfit.SelectedIndex = -1; 
-                cmbSelectOutfit.Text = "Select an outfit..."; 
+                foreach (var outfit in allOutfits)
+                {
+                    cmbSelectOutfit.Items.Add(outfit.Name);
+                }
+
+                cmbSelectOutfit.SelectedIndex = -1;
+                cmbSelectOutfit.Text = "Select an outfit...";
             }
             catch (Exception ex)
             {
@@ -60,7 +63,7 @@ namespace FashionApp_Desktop
 
                 if (selectedOutfit != null)
                 {
-                    _currentOutfitId = selectedOutfit.Id; 
+                    _currentOutfitId = selectedOutfit.Id;
                     txtStyleNameUpdate.Text = selectedOutfit.Name;
                     txtRecommendationUpdate.Text = selectedOutfit.Recommendation;
                     chkIsAvailableUpdate.Checked = selectedOutfit.IsAvailable;
@@ -133,8 +136,8 @@ namespace FashionApp_Desktop
         private void btnCancelUpdate_Click(object sender, EventArgs e)
         {
             ClearFields();
-            LoadOutfitNamesToComboBox(); 
-            UpdateCancelled?.Invoke(this, EventArgs.Empty); 
+            LoadOutfitNamesToComboBox();
+            UpdateCancelled?.Invoke(this, EventArgs.Empty);
         }
 
         private void ClearFields()
@@ -142,7 +145,7 @@ namespace FashionApp_Desktop
             _currentOutfitId = -1;
             txtStyleNameUpdate.Clear();
             txtRecommendationUpdate.Clear();
-            chkIsAvailableUpdate.Checked = false; 
+            chkIsAvailableUpdate.Checked = false;
             cmbSelectOutfit.SelectedIndex = -1;
             cmbSelectOutfit.Text = "Select an outfit...";
 
@@ -151,6 +154,7 @@ namespace FashionApp_Desktop
             chkIsAvailableUpdate.Enabled = false;
             btnSaveChanges.Enabled = false;
         }
+
         private void UcUpdateStyle_Load(object sender, EventArgs e)
         {
             txtStyleNameUpdate.Enabled = false;
@@ -160,6 +164,9 @@ namespace FashionApp_Desktop
             LoadOutfitNamesToComboBox();
         }
 
-
+        internal void LoadOutfitsForSelection()
+        {
+            LoadOutfitNamesToComboBox();
+        }
     }
 }

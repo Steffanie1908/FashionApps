@@ -1,6 +1,7 @@
-﻿using System.Data.SqlClient;
-using System.Collections.Generic;
-using System.Linq; 
+﻿using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Data;
 
 namespace FashionApp_Data_Logic
 {
@@ -20,9 +21,9 @@ namespace FashionApp_Data_Logic
 
         public bool AddOutfit(OutfitModel outfit)
         {
-            const string sql = @"INSERT INTO Outfits (Name, Recommendation, IsAvailable) 
-                                 VALUES (@Name, @Recommendation, @IsAvailable);
-                                 SELECT SCOPE_IDENTITY();"; 
+            const string sql = @"INSERT INTO Outfits (Name, Recommendation, IsAvailable)
+                                   VALUES (@Name, @Recommendation, @IsAvailable);
+                                   SELECT SCOPE_IDENTITY();";
 
             using (var connection = GetConnection())
             {
@@ -44,9 +45,8 @@ namespace FashionApp_Data_Logic
                         }
                         return false;
                     }
-                    catch (SqlException ex)
+                    catch (SqlException)
                     {
-                        System.Diagnostics.Debug.WriteLine($"SQL Error during AddOutfit: {ex.Message}");
                         return false;
                     }
                 }
@@ -110,11 +110,11 @@ namespace FashionApp_Data_Logic
 
         public bool UpdateOutfit(OutfitModel outfit)
         {
-            const string sql = @"UPDATE Outfits 
-                                 SET Name = @Name, 
-                                     Recommendation = @Recommendation, 
-                                     IsAvailable = @IsAvailable,
-                                 WHERE Id = @Id";
+            const string sql = @"UPDATE Outfits
+                                   SET Name = @Name,
+                                       Recommendation = @Recommendation,
+                                       IsAvailable = @IsAvailable
+                                   WHERE Id = @Id";
 
             using (var connection = GetConnection())
             {
@@ -130,26 +130,26 @@ namespace FashionApp_Data_Logic
                     {
                         return cmd.ExecuteNonQuery() > 0;
                     }
-                    catch (SqlException ex)
+                    catch (SqlException)
                     {
-                        System.Diagnostics.Debug.WriteLine($"SQL Error during UpdateOutfit: {ex.Message}");
                         return false;
                     }
                 }
             }
         }
 
-        public bool DeleteOutfit(int id)
+        public bool DeleteOutfit(int id) 
         {
-            const string sql = "DELETE FROM Outfits WHERE Id = @Id";
-
-            using (var connection = GetConnection())
+            using (SqlConnection connection = new SqlConnection(_connectionString))
             {
-                connection.Open();
-                using (var cmd = new SqlCommand(sql, connection))
+                using (SqlCommand command = new SqlCommand("spDeleteOutfit", connection))
                 {
-                    cmd.Parameters.AddWithValue("@Id", id);
-                    return cmd.ExecuteNonQuery() > 0;
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@Id", id);
+
+                    connection.Open();
+                    int rowsAffected = command.ExecuteNonQuery();
+                    return rowsAffected > 0;
                 }
             }
         }
@@ -157,10 +157,10 @@ namespace FashionApp_Data_Logic
         public List<OutfitModel> SearchOutfits(string searchTerm)
         {
             var outfits = new List<OutfitModel>();
-            const string sql = @"SELECT Id, Name, Recommendation, IsAvailable 
-                                 FROM Outfits 
-                                 WHERE Name LIKE @SearchTerm 
-                                 OR Recommendation LIKE @SearchTerm";
+            const string sql = @"SELECT Id, Name, Recommendation, IsAvailable
+                                   FROM Outfits
+                                   WHERE Name LIKE @SearchTerm
+                                   OR Recommendation LIKE @SearchTerm";
 
             using (var connection = GetConnection())
             {
@@ -205,7 +205,6 @@ namespace FashionApp_Data_Logic
                 }
             }
             return names.ToArray();
-     
         }
         public string[] GetAllOutfitNames()
         {
@@ -225,6 +224,40 @@ namespace FashionApp_Data_Logic
                 }
             }
             return names.ToArray();
+        }
+
+        public OutfitModel GetOutfitDetails(int id)
+        {
+            return GetOutfitById(id);
+        }
+
+        public OutfitModel GetOutfitByName(string name)
+        {
+            const string sql = "SELECT Id, Name, Recommendation, IsAvailable FROM Outfits WHERE Name = @Name";
+
+            using (var connection = GetConnection())
+            {
+                connection.Open();
+                using (var cmd = new SqlCommand(sql, connection))
+                {
+                    cmd.Parameters.AddWithValue("@Name", name);
+
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new OutfitModel
+                            {
+                                Id = reader.GetInt32(0),
+                                Name = reader.GetString(1),
+                                Recommendation = reader.GetString(2),
+                                IsAvailable = reader.GetBoolean(3)
+                            };
+                        }
+                    }
+                }
+            }
+            return null;
         }
     }
 }

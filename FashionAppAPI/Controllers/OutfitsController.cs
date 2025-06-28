@@ -2,6 +2,7 @@
 using FashionApp_Data_Logic;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FashionAppAPI.Controllers
 {
@@ -44,7 +45,7 @@ namespace FashionAppAPI.Controllers
         [HttpGet("AvailableNames")]
         public ActionResult<IEnumerable<string>> GetAvailableNames()
         {
-            var names = _outfitService.GetAvailableOutfits();
+            var names = _outfitService.GetAvailableOutfitNames();
             if (names == null || !names.Any())
             {
                 return NotFound("No available outfit names found.");
@@ -65,7 +66,6 @@ namespace FashionAppAPI.Controllers
 
             if (success)
             {
-
                 return Ok("Outfit added successfully. You might need to retrieve it by ID or get all outfits to see its assigned ID.");
             }
             else

@@ -2,6 +2,9 @@
 using FashionApp_Data_Logic;
 using System.Configuration;
 using System.Data.SqlClient;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FashionApp.ConsoleApp
 {
@@ -9,7 +12,6 @@ namespace FashionApp.ConsoleApp
     {
         static void Main(string[] args)
         {
-            
             var connectionString = ConfigurationManager.ConnectionStrings["FashionAppDB"]?.ConnectionString;
 
             if (string.IsNullOrEmpty(connectionString))
@@ -20,7 +22,6 @@ namespace FashionApp.ConsoleApp
                 return;
             }
 
-           
             Console.WriteLine("Testing database connection...");
             try
             {
@@ -29,7 +30,6 @@ namespace FashionApp.ConsoleApp
                     connection.Open();
                     Console.WriteLine("✓ Successfully connected to database");
 
-                   
                     var testRepo = new SqlServerOutfitRepository(connectionString);
                     var testOutfits = testRepo.GetAllOutfits();
                     Console.WriteLine($"✓ Found {testOutfits.Count} existing outfits");
@@ -44,30 +44,33 @@ namespace FashionApp.ConsoleApp
                 return;
             }
 
-            
-            Console.Clear(); 
+            Console.Clear();
 
-           
-            var dataService = new DataService("sqlserver", connectionString);
-            var outfitService = dataService.GetOutfitService();
+            IOutfitRepository outfitRepository = new SqlServerOutfitRepository(connectionString);
+            var outfitService = new OutfitService(outfitRepository);
 
             Console.WriteLine("WELCOME TO STYLE SELECTOR");
 
-           
             bool exitApp = false;
             while (!exitApp)
             {
                 try
                 {
-                    // Gets data from services
-                    string[] outfits = dataService.GetAvailableOutfits();
-                    string[] actions = dataService.GetAvailableActions();
+                    string[] outfits = outfitService.GetAvailableOutfitNames(); 
+                    string[] actions = new string[] 
+                    {
+                        "1. View All Styles",
+                        "2. Select an Outfit",
+                        "3. Add New Style",
+                        "4. Search Styles",
+                        "5. Update Style",
+                        "6. Delete Style",
+                        "7. Exit"
+                    };
 
-                    // Displays the menu and get user choice
                     DisplayActions(actions);
                     int userAction = GetUserChoice(1, actions.Length);
 
-                    // Process the actions
                     exitApp = ProcessUserAction(userAction, outfits, outfitService);
 
                     if (!exitApp)
@@ -139,7 +142,7 @@ namespace FashionApp.ConsoleApp
                     DeleteStyle(outfitService);
                     return false;
                 case 7:
-                    return true; 
+                    return true;
                 default:
                     Console.WriteLine("Invalid choice selected.");
                     return false;
@@ -167,21 +170,17 @@ namespace FashionApp.ConsoleApp
             Console.Write("Your choice: ");
             int outfitChoice = GetUserChoice(1, outfits.Length);
 
-            // Gets selected style and recommendations from business logic
             string selectedStyle = outfits[outfitChoice - 1];
             string recommendation = outfitService.GetRecommendation(selectedStyle);
 
-            // Display results to user
             Console.WriteLine($"\nYou selected the {selectedStyle} style!");
             Console.WriteLine($"Recommendation: {recommendation}");
         }
 
-       
         static void AddNewStyle(OutfitService outfitService)
         {
             Console.WriteLine("\nADD NEW STYLE");
 
-            // Get style name
             string name = "";
             bool isValidName = false;
 
@@ -200,12 +199,10 @@ namespace FashionApp.ConsoleApp
                 }
             }
 
-            // Get style recommendation (instead of description)
             Console.Write("Enter style recommendation: ");
             string recommendation = Console.ReadLine();
 
-            // Adds the new style
-            bool success = outfitService.AddNewOutfit(name, recommendation);
+            bool success = outfitService.AddNewOutfit(name, recommendation, true);
 
             if (success)
             {
@@ -216,7 +213,6 @@ namespace FashionApp.ConsoleApp
                 Console.WriteLine("\nFailed to add style. The style name may already exist.");
             }
         }
-
 
         static void SearchStyles(OutfitService outfitService)
         {
@@ -240,12 +236,10 @@ namespace FashionApp.ConsoleApp
             }
         }
 
-        
         static void UpdateStyle(OutfitService outfitService)
         {
             Console.WriteLine("\nUPDATE STYLE");
 
-            // Shows all styles first
             List<OutfitModel> allOutfits = outfitService.GetAllOutfits();
             if (allOutfits.Count == 0)
             {
@@ -255,10 +249,8 @@ namespace FashionApp.ConsoleApp
 
             DisplayAllStyles(allOutfits);
 
-            // Keeps trying until valid ID is entered or canceled
             while (true)
             {
-                // Get ID to update
                 Console.Write("\nEnter the ID of the style to update (or 0 to cancel): ");
                 if (!int.TryParse(Console.ReadLine(), out int id))
                 {
@@ -272,18 +264,15 @@ namespace FashionApp.ConsoleApp
                     return;
                 }
 
-                // Checks if style exists
-                OutfitModel existingOutfit = outfitService.GetOutfitDetails(id);
+                OutfitModel existingOutfit = outfitService.GetOutfitById(id);
                 if (existingOutfit == null)
                 {
                     Console.WriteLine($"No style found with ID {id}. Please try again.");
                     continue;
                 }
 
-                // Get updated values
                 Console.WriteLine($"Updating style: {existingOutfit.Name}");
 
-                // Get new name
                 Console.Write($"Enter new name (or press Enter to keep '{existingOutfit.Name}'): ");
                 string newName = Console.ReadLine();
                 if (string.IsNullOrWhiteSpace(newName))
@@ -291,7 +280,6 @@ namespace FashionApp.ConsoleApp
                     newName = existingOutfit.Name;
                 }
 
-                // Get new recommendation
                 Console.Write($"Enter new recommendation (or press Enter to keep '{existingOutfit.Recommendation}'): ");
                 string newRecommendation = Console.ReadLine();
                 if (string.IsNullOrWhiteSpace(newRecommendation))
@@ -299,7 +287,6 @@ namespace FashionApp.ConsoleApp
                     newRecommendation = existingOutfit.Recommendation;
                 }
 
-                // Get availability
                 bool isAvailable = existingOutfit.IsAvailable;
                 bool validAvailability = false;
 
@@ -310,7 +297,7 @@ namespace FashionApp.ConsoleApp
 
                     if (string.IsNullOrWhiteSpace(availableInput))
                     {
-                        validAvailability = true; // Keep current value
+                        validAvailability = true;
                     }
                     else if (availableInput.ToUpper() == "Y")
                     {
@@ -328,7 +315,6 @@ namespace FashionApp.ConsoleApp
                     }
                 }
 
-                // Updates the style
                 bool success = outfitService.UpdateOutfit(id, newName, newRecommendation, isAvailable);
 
                 if (success)
@@ -354,12 +340,10 @@ namespace FashionApp.ConsoleApp
             }
         }
 
-        
         static void DeleteStyle(OutfitService outfitService)
         {
             Console.WriteLine("\nDELETE STYLE");
 
-            // Shows all styles first
             List<OutfitModel> allOutfits = outfitService.GetAllOutfits();
             if (allOutfits.Count == 0)
             {
@@ -369,10 +353,8 @@ namespace FashionApp.ConsoleApp
 
             DisplayAllStyles(allOutfits);
 
-            // Keeps trying until valid ID is entered or canceled
             while (true)
             {
-                // Get ID to delete
                 Console.Write("\nEnter the ID of the style to delete (or 0 to cancel): ");
                 if (!int.TryParse(Console.ReadLine(), out int id))
                 {
@@ -386,15 +368,13 @@ namespace FashionApp.ConsoleApp
                     return;
                 }
 
-                // Checks if style exists
-                OutfitModel outfitToDelete = outfitService.GetOutfitDetails(id);
+                OutfitModel outfitToDelete = outfitService.GetOutfitById(id); 
                 if (outfitToDelete == null)
                 {
                     Console.WriteLine($"No style found with ID {id}. Please try again.");
                     continue;
                 }
 
-                // Confirms deletion
                 while (true)
                 {
                     Console.Write($"Are you sure you want to delete style '{outfitToDelete.Name}'? (Y/N): ");
@@ -406,9 +386,7 @@ namespace FashionApp.ConsoleApp
                     }
                     else if (confirmation.ToUpper() == "Y")
                     {
-                        // Deletes the style
                         bool success = outfitService.DeleteOutfit(id);
-
                         if (success)
                         {
                             Console.WriteLine($"\nStyle with ID {id} was deleted successfully!");

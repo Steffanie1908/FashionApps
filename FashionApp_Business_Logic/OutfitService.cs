@@ -1,92 +1,90 @@
-﻿using System;
+﻿using FashionApp_Data_Logic;
 using System.Collections.Generic;
-using FashionApp_Data_Logic;
+using System.Linq;
 
 namespace FashionApp_Business_Logic
 {
     public class OutfitService
     {
-        private readonly IOutfitRepository _repository;
+        private readonly IOutfitRepository _outfitRepository;
 
-        public OutfitService(IOutfitRepository repository)
+        public OutfitService(IOutfitRepository outfitRepository)
         {
-            _repository = repository;
+            _outfitRepository = outfitRepository;
         }
 
-        public string GetRecommendation(string style)
+        public string GetRecommendation(string outfitName)
         {
-            var outfits = _repository.GetAllOutfits();
-            var outfit = outfits.FirstOrDefault(o =>
-                o.Name.Equals(style, StringComparison.OrdinalIgnoreCase));
-
-            return outfit?.Recommendation ?? "No recommendations available for this style.";
+            var outfit = _outfitRepository.GetOutfitByName(outfitName);
+            return outfit?.Recommendation ?? "No recommendation found for this style.";
         }
 
-        public string[] GetAvailableOutfits()
+        public string[] GetAvailableOutfitNames()
         {
-            return _repository.GetAvailableOutfitNames();
+            return _outfitRepository.GetAvailableOutfitNames();
         }
 
-        public bool AddNewOutfit(string name, string recommendation)
+        public bool AddNewOutfit(string name, string recommendation, bool isAvailable)
         {
-            var outfit = new OutfitModel
-            {
-                Name = name,
-                Recommendation = recommendation,
-                IsAvailable = true
-            };
-            return _repository.AddOutfit(outfit);
-        }
-        public bool AddOutfit(OutfitModel newOutfit)
-        {
-            if (newOutfit == null)
+            if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(recommendation))
             {
                 return false;
             }
-            return _repository.AddOutfit(newOutfit);
-        }
 
-        public List<OutfitModel> GetAllOutfits()
-        {
-            return _repository.GetAllOutfits();
-        }
-
-        public List<OutfitModel> SearchOutfits(string searchTerm)
-        {
-            return _repository.SearchOutfits(searchTerm);
-        }
-
-        public OutfitModel GetOutfitDetails(int id)
-        {
-            return _repository.GetOutfitById(id);
-        }
-
-        public bool UpdateOutfit(int id, string name, string recommendation, bool isAvailable)
-        {
-            var existingOutfit = _repository.GetOutfitById(id);
-            if (existingOutfit == null)
-                return false;
-
-            var updatedOutfit = new OutfitModel
+            var newOutfit = new OutfitModel
             {
-                Id = id,
                 Name = name,
                 Recommendation = recommendation,
                 IsAvailable = isAvailable
             };
 
-            return _repository.UpdateOutfit(updatedOutfit);
+            return _outfitRepository.AddOutfit(newOutfit);
         }
 
-        public string[] GetAllOutfitNames() 
+        public List<OutfitModel> GetAllOutfits()
         {
-            return _repository.GetAllOutfitNames();
+            return _outfitRepository.GetAllOutfits();
         }
 
+        public OutfitModel GetOutfitById(int id)
+        {
+            return _outfitRepository.GetOutfitById(id);
+        }
+
+        public bool UpdateOutfit(int id, string newName, string newRecommendation, bool isAvailable)
+        {
+            var outfitToUpdate = _outfitRepository.GetOutfitById(id);
+            if (outfitToUpdate == null)
+            {
+                return false;
+            }
+
+            outfitToUpdate.Name = newName;
+            outfitToUpdate.Recommendation = newRecommendation;
+            outfitToUpdate.IsAvailable = isAvailable;
+
+            return _outfitRepository.UpdateOutfit(outfitToUpdate);
+        }
 
         public bool DeleteOutfit(int id)
         {
-            return _repository.DeleteOutfit(id);
+            return _outfitRepository.DeleteOutfit(id);
+        }
+
+        public List<OutfitModel> SearchOutfits(string searchTerm)
+        {
+            return _outfitRepository.SearchOutfits(searchTerm);
+        }
+
+        public OutfitModel GetOutfitDetails(int id)
+        {
+            return _outfitRepository.GetOutfitById(id);
+        }
+
+        public bool AddNewOutfit(string name, string recommendation)
+        {
+
+            return AddNewOutfit(name, recommendation, true);
         }
     }
 }

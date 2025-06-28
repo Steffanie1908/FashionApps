@@ -2,12 +2,12 @@
 {
     partial class UcAddNewStyle
     {
-        /// <summary> 
+        /// <summary>
         /// Required designer variable.
         /// </summary>
         private System.ComponentModel.IContainer components = null;
 
-        /// <summary> 
+        /// <summary>
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
@@ -22,8 +22,8 @@
 
         #region Component Designer generated code
 
-        /// <summary> 
-        /// Required method for Designer support - do not modify 
+        /// <summary>
+        /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent()
@@ -80,7 +80,7 @@
             // 
             label3.Anchor = AnchorStyles.Right;
             label3.AutoSize = true;
-            label3.Location = new Point(59, 171);
+            label3.Location = new Point(59, 175);
             label3.Name = "label3";
             label3.Size = new Size(74, 20);
             label3.TabIndex = 2;
@@ -90,7 +90,7 @@
             // 
             label1.Anchor = AnchorStyles.Left | AnchorStyles.Right;
             label1.AutoSize = true;
-            label1.Location = new Point(3, 31);
+            label1.Location = new Point(3, 33);
             label1.Name = "label1";
             label1.Size = new Size(130, 20);
             label1.TabIndex = 0;
@@ -100,7 +100,7 @@
             // txtRecommendation
             // 
             txtRecommendation.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            txtRecommendation.Location = new Point(139, 86);
+            txtRecommendation.Location = new Point(139, 92);
             txtRecommendation.Multiline = true;
             txtRecommendation.Name = "txtRecommendation";
             txtRecommendation.ScrollBars = ScrollBars.Vertical;
@@ -110,7 +110,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(3, 83);
+            label2.Location = new Point(3, 87);
             label2.Name = "label2";
             label2.Size = new Size(130, 20);
             label2.TabIndex = 2;
@@ -123,17 +123,17 @@
             chkIsAvailable.AutoSize = true;
             chkIsAvailable.Checked = true;
             chkIsAvailable.CheckState = CheckState.Checked;
-            chkIsAvailable.Location = new Point(139, 169);
+            chkIsAvailable.Location = new Point(139, 177);
             chkIsAvailable.Name = "chkIsAvailable";
-            chkIsAvailable.Size = new Size(101, 24);
+            chkIsAvailable.Size = new Size(18, 17);
             chkIsAvailable.TabIndex = 4;
-            chkIsAvailable.Text = "checkBox1";
             chkIsAvailable.UseVisualStyleBackColor = true;
+            chkIsAvailable.CheckedChanged += chkIsAvailable_CheckedChanged;
             // 
             // txtName
             // 
             txtName.Anchor = AnchorStyles.Left | AnchorStyles.Right;
-            txtName.Location = new Point(139, 28);
+            txtName.Location = new Point(139, 30);
             txtName.Name = "txtName";
             txtName.Size = new Size(658, 27);
             txtName.TabIndex = 1;

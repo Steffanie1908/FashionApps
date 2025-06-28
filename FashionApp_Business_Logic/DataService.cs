@@ -1,58 +1,59 @@
 ﻿using FashionApp_Data_Logic;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FashionApp_Business_Logic
 {
     public class DataService
     {
-        private readonly OutfitService _outfitService;
+        private readonly IOutfitRepository _outfitRepository;
+        private readonly OutfitService _outfitService; 
 
-        public DataService()
-        {
-            // Default InMemory repository
-            IOutfitRepository repository = new InMemoryOutfitRepository();
-            _outfitService = new OutfitService(repository);
-        }
 
-        public DataService(string dataSourceType, string connectionStringOrPath = null)
+        public DataService(string repositoryType, string connectionString = null)
         {
-            IOutfitRepository repository = dataSourceType.ToLower() switch
+ 
+            switch (repositoryType.ToLower())
             {
-                "inmemory" => new InMemoryOutfitRepository(),
-                "textfile" => new TextFileOutfitRepository(connectionStringOrPath ?? "outfits.txt"),
-                "jsonfile" => new JsonFileOutfitRepository(connectionStringOrPath ?? "outfits.json"),
-                "sqlserver" => new SqlServerOutfitRepository(connectionStringOrPath ?? GetDefaultConnectionString()),
-                _ => throw new ArgumentException("Invalid data source type")
-            };
+                case "sqlserver":
+                    _outfitRepository = new SqlServerOutfitRepository(connectionString);
+                    break;
+                case "jsonfile":
+                    _outfitRepository = new JsonFileOutfitRepository("outfits.json"); 
+                    break;
+                case "textfile":
+                    _outfitRepository = new TextFileOutfitRepository("outfits.txt"); 
+                    break;
+                case "inmemory":
+                default:
+                    _outfitRepository = new InMemoryOutfitRepository();
+                    break;
+            }
 
-            _outfitService = new OutfitService(repository);
+            _outfitService = new OutfitService(_outfitRepository);
         }
 
-        private string GetDefaultConnectionString()
+        public OutfitService GetOutfitService()
         {
-            return "Server=.;Database=FashionAppDB;Integrated Security=True;";
+            return _outfitService;
         }
         public string[] GetAvailableOutfits()
         {
-            return _outfitService.GetAvailableOutfits();
+            return _outfitService.GetAvailableOutfitNames();
         }
 
         public string[] GetAvailableActions()
         {
             return new string[]
             {
-                "[1] View Available Styles",
-                "[2] Select Outfit",
-                "[3] Add New Style",
-                "[4] Search Styles",
-                "[5] Update Style",
-                "[6] Delete Style",
-                "[7] Exit"
+                "1. Display all available styles",
+                "2. Select a style and get recommendation",
+                "3. Add a new style",
+                "4. Search styles",
+                "5. Update a style",
+                "6. Delete a style",
+                "7. Exit"
             };
-        }
-
-        public OutfitService GetOutfitService()
-        {
-            return _outfitService;
         }
     }
 }

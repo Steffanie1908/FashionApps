@@ -105,5 +105,14 @@ namespace FashionApp_Data_Logic
                 .Select(o => o.Name)
                 .ToArray();
         }
+        public OutfitModel GetOutfitDetails(int id)
+        {
+            return GetOutfitById(id);
+        }
+
+        public OutfitModel GetOutfitByName(string name)
+        {
+            return _outfits.FirstOrDefault(o => o.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+        }
     }
 }
