@@ -33,6 +33,9 @@
             txtStyleNameDetails = new TextBox();
             label2 = new Label();
             txtRecommendationDetails = new TextBox();
+            chkIsAvailableDetails = new CheckBox();
+            label3 = new Label();
+            btnBackToAllStyles = new Button();
             SuspendLayout();
             // 
             // label1
@@ -50,7 +53,7 @@
             // lblStyleNameTitle
             // 
             lblStyleNameTitle.AutoSize = true;
-            lblStyleNameTitle.Location = new Point(41, 99);
+            lblStyleNameTitle.Location = new Point(47, 67);
             lblStyleNameTitle.Name = "lblStyleNameTitle";
             lblStyleNameTitle.Size = new Size(88, 20);
             lblStyleNameTitle.TabIndex = 1;
@@ -60,7 +63,7 @@
             // txtStyleNameDetails
             // 
             txtStyleNameDetails.BackColor = Color.WhiteSmoke;
-            txtStyleNameDetails.Location = new Point(190, 88);
+            txtStyleNameDetails.Location = new Point(141, 64);
             txtStyleNameDetails.Name = "txtStyleNameDetails";
             txtStyleNameDetails.ReadOnly = true;
             txtStyleNameDetails.Size = new Size(125, 27);
@@ -70,7 +73,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new Point(41, 134);
+            label2.Location = new Point(5, 106);
             label2.Name = "label2";
             label2.Size = new Size(130, 20);
             label2.TabIndex = 3;
@@ -79,26 +82,60 @@
             // 
             // txtRecommendationDetails
             // 
-            txtRecommendationDetails.Location = new Point(190, 131);
+            txtRecommendationDetails.Location = new Point(141, 106);
             txtRecommendationDetails.Multiline = true;
             txtRecommendationDetails.Name = "txtRecommendationDetails";
             txtRecommendationDetails.ReadOnly = true;
-            txtRecommendationDetails.ScrollBars = ScrollBars.Vertical;
             txtRecommendationDetails.Size = new Size(300, 70);
             txtRecommendationDetails.TabIndex = 4;
             txtRecommendationDetails.TextChanged += textBox1_TextChanged_1;
+            // 
+            // chkIsAvailableDetails
+            // 
+            chkIsAvailableDetails.AutoCheck = false;
+            chkIsAvailableDetails.AutoSize = true;
+            chkIsAvailableDetails.Enabled = false;
+            chkIsAvailableDetails.Location = new Point(141, 191);
+            chkIsAvailableDetails.Name = "chkIsAvailableDetails";
+            chkIsAvailableDetails.Size = new Size(18, 17);
+            chkIsAvailableDetails.TabIndex = 5;
+            chkIsAvailableDetails.UseVisualStyleBackColor = true;
+            chkIsAvailableDetails.CheckedChanged += checkBox1_CheckedChanged;
+            // 
+            // label3
+            // 
+            label3.AutoSize = true;
+            label3.Location = new Point(57, 188);
+            label3.Name = "label3";
+            label3.Size = new Size(78, 20);
+            label3.TabIndex = 6;
+            label3.Text = "Available: ";
+            label3.Click += label3_Click;
+            // 
+            // btnBackToAllStyles
+            // 
+            btnBackToAllStyles.Location = new Point(371, 261);
+            btnBackToAllStyles.Name = "btnBackToAllStyles";
+            btnBackToAllStyles.Size = new Size(70, 30);
+            btnBackToAllStyles.TabIndex = 7;
+            btnBackToAllStyles.Text = "Back";
+            btnBackToAllStyles.UseVisualStyleBackColor = true;
+            btnBackToAllStyles.Click += btnBackToAllStyles_Click;
             // 
             // UcViewStyleDetails
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(btnBackToAllStyles);
+            Controls.Add(label3);
+            Controls.Add(chkIsAvailableDetails);
             Controls.Add(txtRecommendationDetails);
             Controls.Add(label2);
             Controls.Add(txtStyleNameDetails);
             Controls.Add(lblStyleNameTitle);
             Controls.Add(label1);
             Name = "UcViewStyleDetails";
-            Size = new Size(530, 400);
+            Size = new Size(458, 314);
             Load += UcViewStyleDetails_Load;
             ResumeLayout(false);
             PerformLayout();
@@ -111,5 +148,8 @@
         private TextBox txtStyleNameDetails;
         private Label label2;
         private TextBox txtRecommendationDetails;
+        private CheckBox chkIsAvailableDetails;
+        private Label label3;
+        private Button btnBackToAllStyles;
     }
 }

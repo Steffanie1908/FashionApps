@@ -12,7 +12,5 @@ namespace FashionApp_Data_Logic
         public string Name { get; set; }
         public string Recommendation { get; set; }
         public bool IsAvailable { get; set; }
-        public DateTime CreatedDate { get; set; }
-        public DateTime ModifiedDate { get; set; }
     }
 }

@@ -21,7 +21,7 @@ namespace FashionApp_Data_Logic
         public bool AddOutfit(OutfitModel outfit)
         {
             const string sql = @"INSERT INTO Outfits (Name, Recommendation, IsAvailable) 
-                                 VALUES (@Name, @Recommendation, @IsAvailable, GETDATE(), GETDATE());
+                                 VALUES (@Name, @Recommendation, @IsAvailable);
                                  SELECT SCOPE_IDENTITY();"; 
 
             using (var connection = GetConnection())
@@ -114,7 +114,6 @@ namespace FashionApp_Data_Logic
                                  SET Name = @Name, 
                                      Recommendation = @Recommendation, 
                                      IsAvailable = @IsAvailable,
-                                     ModifiedDate = GETDATE()
                                  WHERE Id = @Id";
 
             using (var connection = GetConnection())

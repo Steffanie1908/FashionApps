@@ -1,6 +1,4 @@
-﻿// FashionApp_Data_Logic/IOutfitRepository.cs
-
-using System.Collections.Generic; // Make sure this is present
+﻿using System.Collections.Generic;
 
 namespace FashionApp_Data_Logic
 {
