@@ -25,17 +25,14 @@ namespace FashionApp_Desktop
 
             _outfitService = outfitService;
         }
-
         private void label1_Click(object sender, EventArgs e)
         {
 
         }
-
         private void tblPanelInputs_Paint(object sender, PaintEventArgs e)
         {
 
         }
-
         private void label2_Click(object sender, EventArgs e)
         {
 
