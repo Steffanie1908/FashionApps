@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace FashionApp.ConsoleApp
 {
@@ -49,6 +50,9 @@ namespace FashionApp.ConsoleApp
             IOutfitRepository outfitRepository = new SqlServerOutfitRepository(connectionString);
             var outfitService = new OutfitService(outfitRepository);
 
+            string userEmail = GetUserEmail();
+            outfitService.SetUserEmail(userEmail);
+
             Console.WriteLine("WELCOME TO STYLE SELECTOR");
 
             bool exitApp = false;
@@ -56,8 +60,8 @@ namespace FashionApp.ConsoleApp
             {
                 try
                 {
-                    string[] outfits = outfitService.GetAvailableOutfitNames(); 
-                    string[] actions = new string[] 
+                    string[] outfits = outfitService.GetAvailableOutfitNames();
+                    string[] actions = new string[]
                     {
                         "1. View All Styles",
                         "2. Select an Outfit",
@@ -92,6 +96,50 @@ namespace FashionApp.ConsoleApp
             Console.WriteLine("\nThank you for using Style Selector. Goodbye!");
             Console.WriteLine("Press any key to exit...");
             Console.ReadKey();
+        }
+
+        static string GetUserEmail()
+        {
+            Console.WriteLine("STYLE SELECTOR - Email Notification Setup");
+            Console.WriteLine("=========================================");
+
+            while (true)
+            {
+                Console.Write("Enter your email address for style recommendations (or press Enter to skip): ");
+                string email = Console.ReadLine()?.Trim();
+
+                if (string.IsNullOrWhiteSpace(email))
+                {
+                    Console.WriteLine("Email notifications disabled for this session.\n");
+                    return null;
+                }
+
+                if (IsValidEmail(email))
+                {
+                    Console.WriteLine($"Email notifications enabled for: {email}\n");
+                    return email;
+                }
+                else
+                {
+                    Console.WriteLine("Invalid email format. Please try again.\n");
+                }
+            }
+        }
+
+        static bool IsValidEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return false;
+
+            try
+            {
+                var emailPattern = @"^[^@\s]+@[^@\s]+\.[^@\s]+$";
+                return Regex.IsMatch(email, emailPattern, RegexOptions.IgnoreCase);
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         static void DisplayActions(string[] actions)
@@ -175,6 +223,8 @@ namespace FashionApp.ConsoleApp
 
             Console.WriteLine($"\nYou selected the {selectedStyle} style!");
             Console.WriteLine($"Recommendation: {recommendation}");
+
+            outfitService.SendOutfitRecommendationEmail(selectedStyle);
         }
 
         static void AddNewStyle(OutfitService outfitService)
@@ -368,7 +418,7 @@ namespace FashionApp.ConsoleApp
                     return;
                 }
 
-                OutfitModel outfitToDelete = outfitService.GetOutfitById(id); 
+                OutfitModel outfitToDelete = outfitService.GetOutfitById(id);
                 if (outfitToDelete == null)
                 {
                     Console.WriteLine($"No style found with ID {id}. Please try again.");
