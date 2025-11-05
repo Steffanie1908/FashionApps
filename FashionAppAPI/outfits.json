@@ -34,5 +34,11 @@
     "Name": "Sleeper\u0027s build",
     "Recommendation": "Compressed Shirt, Grey pants, Black Shoes",
     "IsAvailable": true
+  },
+  {
+    "Id": 7,
+    "Name": "string",
+    "Recommendation": "string",
+    "IsAvailable": true
   }
 ]
