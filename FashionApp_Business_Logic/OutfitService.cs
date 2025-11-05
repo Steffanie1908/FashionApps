@@ -10,6 +10,13 @@ namespace FashionApp_Business_Logic
         private readonly EmailService _emailService;
         private string _userEmail;
 
+        public OutfitService(IOutfitRepository outfitRepository, EmailService emailService)
+        {
+            _outfitRepository = outfitRepository;
+            _emailService = emailService;
+            _userEmail = null;
+        }
+
         public OutfitService(IOutfitRepository outfitRepository)
         {
             _outfitRepository = outfitRepository;
@@ -48,6 +55,21 @@ namespace FashionApp_Business_Logic
             return _outfitRepository.AddOutfit(newOutfit);
         }
 
+        public bool AddNewOutfit(string name, string recommendation)
+        {
+            return AddNewOutfit(name, recommendation, true);
+        }
+
+        public bool AddNewOutfitWithEmail(string name, string recommendation, string recipientEmail)
+        {
+            bool success = AddNewOutfit(name, recommendation, true);
+            if (success && !string.IsNullOrWhiteSpace(recipientEmail))
+            {
+                _emailService.SendOutfitAddedEmail(recipientEmail, name, recommendation);
+            }
+            return success;
+        }
+
         public List<OutfitModel> GetAllOutfits()
         {
             return _outfitRepository.GetAllOutfits();
@@ -71,9 +93,44 @@ namespace FashionApp_Business_Logic
             return _outfitRepository.UpdateOutfit(outfitToUpdate);
         }
 
+        public bool UpdateOutfitWithEmail(int id, string newName, string newRecommendation, bool isAvailable, string recipientEmail)
+        {
+            var oldOutfit = _outfitRepository.GetOutfitById(id);
+            if (oldOutfit == null)
+                return false;
+
+            string oldName = oldOutfit.Name;
+            string oldRec = oldOutfit.Recommendation;
+
+            bool success = UpdateOutfit(id, newName, newRecommendation, isAvailable);
+
+            if (success && !string.IsNullOrWhiteSpace(recipientEmail))
+            {
+                _emailService.SendOutfitUpdatedEmail(recipientEmail, oldName, newName, oldRec, newRecommendation);
+            }
+
+            return success;
+        }
+
         public bool DeleteOutfit(int id)
         {
             return _outfitRepository.DeleteOutfit(id);
+        }
+        public bool DeleteOutfitWithEmail(int id, string recipientEmail)
+        {
+            var outfit = _outfitRepository.GetOutfitById(id);
+            if (outfit == null)
+                return false;
+
+            string outfitName = outfit.Name;
+            bool success = DeleteOutfit(id);
+
+            if (success && !string.IsNullOrWhiteSpace(recipientEmail))
+            {
+                _emailService.SendOutfitDeletedEmail(recipientEmail, outfitName);
+            }
+
+            return success;
         }
 
         public List<OutfitModel> SearchOutfits(string searchTerm)
@@ -86,23 +143,28 @@ namespace FashionApp_Business_Logic
             return _outfitRepository.GetOutfitById(id);
         }
 
-        public bool AddNewOutfit(string name, string recommendation)
-        {
-            return AddNewOutfit(name, recommendation, true);
-        }
-
         public void SendOutfitRecommendationEmail(string outfitName)
         {
             if (string.IsNullOrWhiteSpace(_userEmail))
             {
                 return;
             }
-
             var outfit = _outfitRepository.GetOutfitByName(outfitName);
             if (outfit != null)
             {
                 _emailService.SendOutfitRecommendationEmail(_userEmail, outfit.Name, outfit.Recommendation);
             }
+        }
+        public bool SendOutfitRecommendationEmail(int id, string recipientEmail)
+        {
+            if (string.IsNullOrWhiteSpace(recipientEmail))
+                return false;
+
+            var outfit = _outfitRepository.GetOutfitById(id);
+            if (outfit == null)
+                return false;
+
+            return _emailService.SendOutfitRecommendationEmail(recipientEmail, outfit.Name, outfit.Recommendation);
         }
     }
 }

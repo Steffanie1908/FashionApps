@@ -28,5 +28,11 @@
     "Name": "Hip-hop Style",
     "Recommendation": "Oversized black shirt, Baggy mint green pants, Chain necklace, Silver Rings, Vans shoes",
     "IsAvailable": true
+  },
+  {
+    "Id": 6,
+    "Name": "Sleeper\u0027s build",
+    "Recommendation": "Compressed Shirt, Grey pants, Black Shoes",
+    "IsAvailable": true
   }
 ]

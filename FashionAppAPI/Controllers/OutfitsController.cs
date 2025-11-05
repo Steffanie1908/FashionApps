@@ -54,19 +54,28 @@ namespace FashionAppAPI.Controllers
         }
 
         // POST: api/Outfits
+        // Body: { "name": "Outfit Name", "recommendation": "Style advice", "email": "user@example.com" }
         [HttpPost]
-        public ActionResult<OutfitModel> Post([FromBody] OutfitModel newOutfit)
+        public ActionResult Post([FromBody] AddOutfitRequest request)
         {
-            if (newOutfit == null)
+            if (request == null || string.IsNullOrWhiteSpace(request.Name))
             {
-                return BadRequest("Outfit data is null.");
+                return BadRequest("Outfit name is required.");
             }
 
-            bool success = _outfitService.AddNewOutfit(newOutfit.Name, newOutfit.Recommendation);
+            bool success = _outfitService.AddNewOutfitWithEmail(
+                request.Name,
+                request.Recommendation ?? "",
+                request.Email
+            );
 
             if (success)
             {
-                return Ok("Outfit added successfully. You might need to retrieve it by ID or get all outfits to see its assigned ID.");
+                return Ok(new
+                {
+                    message = "Outfit added successfully.",
+                    emailSent = !string.IsNullOrWhiteSpace(request.Email)
+                });
             }
             else
             {
@@ -74,21 +83,31 @@ namespace FashionAppAPI.Controllers
             }
         }
 
-
         // PUT: api/Outfits/{id}
+        // Body: { "id": 1, "name": "Updated Name", "recommendation": "New advice", "isAvailable": true, "email": "user@example.com" }
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] OutfitModel updatedOutfit)
+        public IActionResult Put(int id, [FromBody] UpdateOutfitRequest request)
         {
-            if (updatedOutfit == null || id != updatedOutfit.Id)
+            if (request == null || id != request.Id)
             {
                 return BadRequest("Outfit ID mismatch or invalid data.");
             }
 
-            bool success = _outfitService.UpdateOutfit(id, updatedOutfit.Name, updatedOutfit.Recommendation, updatedOutfit.IsAvailable);
+            bool success = _outfitService.UpdateOutfitWithEmail(
+                id,
+                request.Name,
+                request.Recommendation,
+                request.IsAvailable,
+                request.Email
+            );
 
             if (success)
             {
-                return NoContent();
+                return Ok(new
+                {
+                    message = "Outfit updated successfully.",
+                    emailSent = !string.IsNullOrWhiteSpace(request.Email)
+                });
             }
             else
             {
@@ -101,14 +120,19 @@ namespace FashionAppAPI.Controllers
             }
         }
 
-        // DELETE: api/Outfits/{id}
+        // DELETE: api/Outfits/{id}?email={email}
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public IActionResult Delete(int id, [FromQuery] string email = null)
         {
-            bool success = _outfitService.DeleteOutfit(id);
+            bool success = _outfitService.DeleteOutfitWithEmail(id, email);
+
             if (success)
             {
-                return NoContent();
+                return Ok(new
+                {
+                    message = "Outfit deleted successfully.",
+                    emailSent = !string.IsNullOrWhiteSpace(email)
+                });
             }
             else
             {
@@ -127,5 +151,53 @@ namespace FashionAppAPI.Controllers
             }
             return Ok(results);
         }
+
+        // POST: api/Outfits/{id}/select
+        // Body: { "email": "user@example.com" }
+        [HttpPost("{id}/select")]
+        public IActionResult SelectOutfit(int id, [FromBody] SelectOutfitRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request?.Email))
+            {
+                return BadRequest("Email is required to receive style recommendation.");
+            }
+
+            bool emailSent = _outfitService.SendOutfitRecommendationEmail(id, request.Email);
+
+            if (emailSent)
+            {
+                return Ok(new
+                {
+                    message = "Style recommendation sent successfully!",
+                    emailSent = true
+                });
+            }
+            else
+            {
+                return NotFound($"Outfit with ID {id} not found.");
+            }
+        }
+    }
+
+    // Request models
+    public class AddOutfitRequest
+    {
+        public string Name { get; set; } = string.Empty;
+        public string? Recommendation { get; set; }
+        public string? Email { get; set; }
+    }
+
+    public class UpdateOutfitRequest
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Recommendation { get; set; } = string.Empty;
+        public bool IsAvailable { get; set; } = true;
+        public string? Email { get; set; }
+    }
+
+    public class SelectOutfitRequest
+    {
+        public string Email { get; set; } = string.Empty;
     }
 }
